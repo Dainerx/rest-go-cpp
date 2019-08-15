@@ -25,7 +25,11 @@ func NewSolverRequest(solver string, input string, user models.User) *SolveReque
 	return &sr
 }
 
-func addSolveRequest(sr *SolveRequest) error {
+func (sr SolveRequest) GetId() int64 {
+	return sr.id
+}
+
+func AddSolveRequest(sr *SolveRequest) error {
 	result, err := models.Db.Exec("INSERT INTO solve_request (solver,input,date,user) VALUES(?,?,?,?)", (*sr).Solver, (*sr).Input, (*sr).date, (*sr).user.Id)
 	if err != nil {
 		return err

@@ -80,10 +80,10 @@ func UnauthorizedResponse() SolveResponse {
 }
 
 func addSolveResponse(srs *SolveResponse) error {
-	if err := addSolveRequest((*srs).solverRequest); err != nil {
+	if err := request.AddSolveRequest((*srs).solverRequest); err != nil {
 		return err
 	}
-	_, err := models.Db.Exec("INSERT INTO solve_request (solver_request,status,message,output,date) VALUES(?,?,?,?,?)", (*srs).solverRequest.id, (*srs).Status, (*srs).Message, (*srs).Output, (*srs).date)
+	_, err := models.Db.Exec("INSERT INTO solve_request (solver_request,status,message,output,date) VALUES(?,?,?,?,?)", (*srs).solverRequest.GetId(), (*srs).Status, (*srs).Message, (*srs).Output, (*srs).date)
 	if err != nil {
 		return err
 	}

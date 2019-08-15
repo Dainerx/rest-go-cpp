@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"betell-rest/cpp"
-	"betell-rest/models"
 	"betell-rest/models/request"
 	"betell-rest/models/response"
 	"encoding/json"
@@ -11,7 +10,7 @@ import (
 )
 
 var UsersRunningInstances = make(map[int64](chan string))
-var UserRequests = make(map[int64](*models.SolveRequest))
+var UserRequests = make(map[int64](*request.SolveRequest))
 
 const (
 	MESSAGE_CHECK_INPUT      = "Request body is wrong."
@@ -29,9 +28,9 @@ func Solve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req request.SolveRequest
-	json.NewDecoder(r.Body).Decode(&re)
-	req = request.NewSolverRequest(re.Solver, re.Input, *user)
+	var reqg request.SolveRequest
+	json.NewDecoder(r.Body).Decode(&reqg)
+	req := request.NewSolverRequest(reqg.Solver, reqg.Input, *user)
 	if (*req).Correct() == false {
 		res, err := response.ErrorResponse(req, MESSAGE_CHECK_INPUT)
 		if err != nil {
@@ -61,15 +60,24 @@ func Solve(w http.ResponseWriter, r *http.Request) {
 	case output := <-c:
 		if output != "error" {
 			res, err := response.SuccessResponse(req, output)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 			json.NewEncoder(w).Encode(res)
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
 			res, err := response.ErrorResponse(req, MESSAGE_INTERNAL_ERROR)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 			json.NewEncoder(w).Encode(res)
 		}
 		return
 	case <-timer.C:
 		res, err := response.WaitingResponse(req)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 		json.NewEncoder(w).Encode(res)
 		return
 	}
@@ -81,7 +89,7 @@ func Status(w http.ResponseWriter, r *http.Request) {
 	isAuthenticated, user := Authenticated(w, r)
 	if isAuthenticated == false {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(models.UnauthorizedResponse())
+		json.NewEncoder(w).Encode(response.UnauthorizedResponse())
 		return
 	}
 
@@ -90,16 +98,25 @@ func Status(w http.ResponseWriter, r *http.Request) {
 		case <-c:
 			delete(UsersRunningInstances, (*user).Id)
 			delete(UserRequests, (*user).Id)
-			res, err := models.SuccessResponse(UserRequests[(*user).Id], <-c)
+			res, err := response.SuccessResponse(UserRequests[(*user).Id], <-c)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 			json.NewEncoder(w).Encode(res)
 			return
 		default:
-			res, err := models.WaitingResponse(UserRequests[(*user).Id])
+			res, err := response.WaitingResponse(UserRequests[(*user).Id])
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 			json.NewEncoder(w).Encode(res)
 			return
 		}
 	} else {
-		res, err := models.SuccessResponse(UserRequests[(*user).Id], "no output")
+		res, err := response.SuccessResponse(UserRequests[(*user).Id], "no output")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 		json.NewEncoder(w).Encode(res)
 	}
 }

@@ -1,12 +1,14 @@
-package models
+package response
 
 import (
+	"betell-rest/models"
+	"betell-rest/models/request"
 	"time"
 )
 
 type SolveResponse struct {
 	id            int
-	solverRequest *SolveRequest
+	solverRequest *request.SolveRequest
 	Status        string ""
 	Message       string ""
 	Output        string
@@ -25,7 +27,7 @@ const (
 	NO_OUTPUT_YET             = "no output yet"
 )
 
-func SuccessResponse(sr *SolveRequest, output string) (SolveResponse, error) {
+func SuccessResponse(sr *request.SolveRequest, output string) (SolveResponse, error) {
 	srs := new(SolveResponse)
 	(*srs).solverRequest = sr
 	(*srs).Status = OK
@@ -43,7 +45,7 @@ func SuccessResponse(sr *SolveRequest, output string) (SolveResponse, error) {
 	return *srs, nil
 }
 
-func WaitingResponse(sr *SolveRequest) (SolveResponse, error) {
+func WaitingResponse(sr *request.SolveRequest) (SolveResponse, error) {
 	srs := new(SolveResponse)
 	(*srs).solverRequest = sr
 	(*srs).Status = OK
@@ -56,7 +58,7 @@ func WaitingResponse(sr *SolveRequest) (SolveResponse, error) {
 	return *srs, nil
 }
 
-func ErrorResponse(sr *SolveRequest, message string) (SolveResponse, error) {
+func ErrorResponse(sr *request.SolveRequest, message string) (SolveResponse, error) {
 	srs := new(SolveResponse)
 	(*srs).solverRequest = sr
 	(*srs).Status = ERROR
@@ -81,7 +83,7 @@ func addSolveResponse(srs *SolveResponse) error {
 	if err := addSolveRequest((*srs).solverRequest); err != nil {
 		return err
 	}
-	_, err := db.Exec("INSERT INTO solve_request (solver_request,status,message,output,date) VALUES(?,?,?,?,?)", (*srs).solverRequest.id, (*srs).Status, (*srs).Message, (*srs).Output, (*srs).date)
+	_, err := models.Db.Exec("INSERT INTO solve_request (solver_request,status,message,output,date) VALUES(?,?,?,?,?)", (*srs).solverRequest.id, (*srs).Status, (*srs).Message, (*srs).Output, (*srs).date)
 	if err != nil {
 		return err
 	}

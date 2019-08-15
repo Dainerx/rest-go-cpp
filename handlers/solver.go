@@ -3,6 +3,8 @@ package handlers
 import (
 	"betell-rest/cpp"
 	"betell-rest/models"
+	"betell-rest/models/request"
+	"betell-rest/models/response"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -23,21 +25,21 @@ func Solve(w http.ResponseWriter, r *http.Request) {
 	isAuthenticated, user := Authenticated(w, r)
 	if isAuthenticated == false {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(models.UnauthorizedResponse())
+		json.NewEncoder(w).Encode(response.UnauthorizedResponse())
 		return
 	}
 
-	var re models.SolveRequest
+	var req request.SolveRequest
 	json.NewDecoder(r.Body).Decode(&re)
-	request := models.NewSolverRequest(re.Solver, re.Input, *user)
-	if (*request).Correct() == false {
-		response, err := models.ErrorResponse(request, MESSAGE_CHECK_INPUT)
+	req = request.NewSolverRequest(re.Solver, re.Input, *user)
+	if (*req).Correct() == false {
+		res, err := response.ErrorResponse(req, MESSAGE_CHECK_INPUT)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(response)
+			json.NewEncoder(w).Encode(res)
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(response)
+			json.NewEncoder(w).Encode(res)
 		}
 		return
 	}
@@ -46,9 +48,9 @@ func Solve(w http.ResponseWriter, r *http.Request) {
 	c := make(chan string)
 	//test if it exisits already
 	UsersRunningInstances[(*user).Id] = c //important
-	UserRequests[(*user).Id] = request
+	UserRequests[(*user).Id] = req
 	go func() {
-		output, err := cpp.Run(request.Solver)
+		output, err := cpp.Run(req.Solver)
 		if err != nil {
 			c <- "error" // unblock channel with error
 		} else {
@@ -58,17 +60,17 @@ func Solve(w http.ResponseWriter, r *http.Request) {
 	select {
 	case output := <-c:
 		if output != "error" {
-			response, err := models.SuccessResponse(request, output)
-			json.NewEncoder(w).Encode()
+			res, err := response.SuccessResponse(req, output)
+			json.NewEncoder(w).Encode(res)
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
-			response, err := models.ErrorResponse(request, MESSAGE_INTERNAL_ERROR)
-			json.NewEncoder(w).Encode()
+			res, err := response.ErrorResponse(req, MESSAGE_INTERNAL_ERROR)
+			json.NewEncoder(w).Encode(res)
 		}
 		return
 	case <-timer.C:
-		response, err := models.WaitingResponse(request)
-		json.NewEncoder(w).Encode()
+		res, err := response.WaitingResponse(req)
+		json.NewEncoder(w).Encode(res)
 		return
 	}
 }
@@ -88,16 +90,16 @@ func Status(w http.ResponseWriter, r *http.Request) {
 		case <-c:
 			delete(UsersRunningInstances, (*user).Id)
 			delete(UserRequests, (*user).Id)
-			response, err := models.SuccessResponse(UserRequests[(*user).Id], <-c)
-			json.NewEncoder(w).Encode()
+			res, err := models.SuccessResponse(UserRequests[(*user).Id], <-c)
+			json.NewEncoder(w).Encode(res)
 			return
 		default:
-			response, err := models.WaitingResponse(UserRequests[(*user).Id])
-			json.NewEncoder(w).Encode()
+			res, err := models.WaitingResponse(UserRequests[(*user).Id])
+			json.NewEncoder(w).Encode(res)
 			return
 		}
 	} else {
-		response, err := models.SuccessResponse(UserRequests[(*user).Id], "no output")
-		json.NewEncoder(w).Encode()
+		res, err := models.SuccessResponse(UserRequests[(*user).Id], "no output")
+		json.NewEncoder(w).Encode(res)
 	}
 }

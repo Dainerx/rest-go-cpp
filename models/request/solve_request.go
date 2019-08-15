@@ -1,7 +1,8 @@
-package models
+package request
 
 import (
-	"betell-rest/util"
+	"betell-rest/models"
+	"betell-rest/pkg/slice"
 	"time"
 )
 
@@ -10,12 +11,12 @@ type SolveRequest struct {
 	Solver string ""
 	Input  string ""
 	date   int64
-	user   User
+	user   models.User
 }
 
 var SOLVERS = []string{"loop1e9", "loop1e10", "loop1K", "loop2e9", "loop4e9", "loop10K"}
 
-func NewSolverRequest(solver string, input string, user User) *SolveRequest {
+func NewSolverRequest(solver string, input string, user models.User) *SolveRequest {
 	var sr SolveRequest
 	sr.Solver = solver
 	sr.Input = input
@@ -25,7 +26,7 @@ func NewSolverRequest(solver string, input string, user User) *SolveRequest {
 }
 
 func addSolveRequest(sr *SolveRequest) error {
-	result, err := db.Exec("INSERT INTO solve_request (solver,input,date,user) VALUES(?,?,?,?)", (*sr).Solver, (*sr).Input, (*sr).date, (*sr).user.Id)
+	result, err := models.Db.Exec("INSERT INTO solve_request (solver,input,date,user) VALUES(?,?,?,?)", (*sr).Solver, (*sr).Input, (*sr).date, (*sr).user.Id)
 	if err != nil {
 		return err
 	}
@@ -39,7 +40,7 @@ func (sr SolveRequest) Correct() bool {
 }
 
 func (sr SolveRequest) solverExists() bool {
-	return util.ContainString(SOLVERS, sr.Solver)
+	return slice.ContainString(SOLVERS, sr.Solver)
 }
 
 func (sr SolveRequest) empty() bool {

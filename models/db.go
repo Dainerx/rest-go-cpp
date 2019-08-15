@@ -7,16 +7,16 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var db *sql.DB
+var Db *sql.DB
 
 func InitDB() {
 	var err error
-	db, err = sql.Open("mysql", "root:root@/betell_rest")
+	Db, err = sql.Open("mysql", "root:root@/betell_rest")
 	if err != nil {
 		log.Panic(err)
 	}
 
-	if err = db.Ping(); err != nil {
+	if err = Db.Ping(); err != nil {
 		log.Panic(err)
 	}
 }

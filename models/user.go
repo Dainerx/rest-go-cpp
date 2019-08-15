@@ -9,7 +9,7 @@ type User struct {
 }
 
 func AllUsers() ([]*User, error) {
-	rows, err := db.Query("SELECT * FROM users")
+	rows, err := Db.Query("SELECT * FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -32,11 +32,11 @@ func AllUsers() ([]*User, error) {
 
 func AddUser(email, pass string) error {
 
-	hash, err := password.HashPassword(pass)
+	hash, err := password.HashPass(pass)
 	if err != nil {
 		return err
 	} else {
-		_, err := db.Exec("INSERT INTO users (email,password) VALUES(?,?)", email, hash)
+		_, err := Db.Exec("INSERT INTO users (email,password) VALUES(?,?)", email, hash)
 		if err != nil {
 			return err
 		}
@@ -45,11 +45,12 @@ func AddUser(email, pass string) error {
 }
 
 func GetUser(id int64) (User, error) {
-	rows, err := db.Query("SELECT * FROM users where id=?", id)
+	rows, err := Db.Query("SELECT * FROM users where id=?", id)
 	user := new(User)
 	if err != nil {
 		return *user, err
 	} else {
+		defer rows.Close()
 		for rows.Next() {
 			err := rows.Scan(&user.Id, &user.Email, &user.Password)
 			if err != nil {
@@ -63,17 +64,18 @@ func GetUser(id int64) (User, error) {
 //remove bool as return type leave only user since it reflects the result
 func UserExists(email, pass string) (bool, *User, error) {
 	user := new(User)
-	rows, err := db.Query("SELECT id, email, password FROM users where email=?", email)
+	rows, err := Db.Query("SELECT id, email, password FROM users where email=?", email)
 	if err != nil {
 		return false, user, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&user.Id, &user.Email, &user.Password)
 		if err != nil {
 			return false, user, err
 		}
 	}
-	if ok := password.CheckPasswordHash(pass, user.Password); !ok {
+	if ok := password.CheckPassHash(pass, user.Password); !ok {
 		return false, user, nil
 	}
 	return true, user, nil

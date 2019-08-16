@@ -1,1 +1,1 @@
-![build](https://travis-ci.org/Dainerx/REST-CPP.svg?branch=dev "Build")
+![build](https://travis-ci.org/Dainerx/rest-go-cpp.svg?branch=dev "Build")

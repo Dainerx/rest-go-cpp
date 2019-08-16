@@ -1,9 +1,9 @@
 package main
 
 import (
-	"betell-rest/handlers"
-	"betell-rest/models"
 	"net/http"
+	"rest-go-cpp/handlers"
+	"rest-go-cpp/models"
 
 	"github.com/gorilla/mux"
 )

@@ -1,8 +1,8 @@
 package response
 
 import (
-	"betell-rest/models"
-	"betell-rest/models/request"
+	"rest-go-cpp/models"
+	"rest-go-cpp/models/request"
 	"time"
 )
 

@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"betell-rest/models"
 	"encoding/json"
 	"net/http"
+	"rest-go-cpp/models"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"

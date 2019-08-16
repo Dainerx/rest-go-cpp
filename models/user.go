@@ -1,6 +1,6 @@
 package models
 
-import "betell-rest/pkg/password"
+import "rest-go-cpp/pkg/password"
 
 type User struct {
 	Id       int64

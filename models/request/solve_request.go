@@ -1,8 +1,8 @@
 package request
 
 import (
-	"betell-rest/models"
-	"betell-rest/pkg/slice"
+	"rest-go-cpp/models"
+	"rest-go-cpp/pkg/slice"
 	"time"
 )
 

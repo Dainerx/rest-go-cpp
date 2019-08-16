@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"betell-rest/cpp"
-	"betell-rest/models/request"
-	"betell-rest/models/response"
 	"encoding/json"
 	"net/http"
+	"rest-go-cpp/cpp"
+	"rest-go-cpp/models/request"
+	"rest-go-cpp/models/response"
 	"time"
 )
 

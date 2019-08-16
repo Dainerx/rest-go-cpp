@@ -1,9 +1,10 @@
 package response
 
 import (
-	"rest-go-cpp/models"
-	"rest-go-cpp/models/request"
 	"time"
+
+	"github.com/Dainerx/rest-go-cpp/models"
+	"github.com/Dainerx/rest-go-cpp/models/request"
 )
 
 type SolveResponse struct {

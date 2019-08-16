@@ -3,9 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"rest-go-cpp/models"
 	"time"
 
+	"github.com/Dainerx/rest-go-cpp/models"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 

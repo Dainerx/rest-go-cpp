@@ -1,6 +1,6 @@
 package models
 
-import "rest-go-cpp/pkg/password"
+import "github.com/Dainerx/rest-go-cpp/pkg/password"
 
 type User struct {
 	Id       int64

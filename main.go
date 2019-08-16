@@ -2,9 +2,9 @@ package main
 
 import (
 	"net/http"
-	"rest-go-cpp/handlers"
-	"rest-go-cpp/models"
 
+	"github.com/Dainerx/rest-go-cpp/handlers"
+	"github.com/Dainerx/rest-go-cpp/models"
 	"github.com/gorilla/mux"
 )
 

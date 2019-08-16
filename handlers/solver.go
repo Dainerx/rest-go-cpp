@@ -3,10 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"rest-go-cpp/cpp"
-	"rest-go-cpp/models/request"
-	"rest-go-cpp/models/response"
 	"time"
+
+	"github.com/Dainerx/rest-go-cpp/cpp"
+	"github.com/Dainerx/rest-go-cpp/models/request"
+	"github.com/Dainerx/rest-go-cpp/models/response"
 )
 
 var UsersRunningInstances = make(map[int64](chan string))

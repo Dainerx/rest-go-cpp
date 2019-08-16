@@ -1,9 +1,10 @@
 package request
 
 import (
-	"rest-go-cpp/models"
-	"rest-go-cpp/pkg/slice"
 	"time"
+
+	"github.com/Dainerx/rest-go-cpp/models"
+	"github.com/Dainerx/rest-go-cpp/pkg/slice"
 )
 
 type SolveRequest struct {

@@ -3,3 +3,5 @@ dist: xenial
 language: go
 go:
 - master
+script:
+- go test -v -race ./...

@@ -4,11 +4,12 @@ language: go
 go:
   - master
 env:
-  - DB_BETELL_DB="betell_rest"
-  - DB_BETELL_USER="root" # or travis as username
-  - DB_BETELL_PASS="" # for travis password is empty
-  - DB_BETELL_EXPORTED="$HOME/betell_rest_exported.sql"
-  - DB_BETELL_SEED="$HOME/betell_rest.yml"
+  global:
+    - DB_BETELL_DB="betell_rest"
+    - DB_BETELL_USER="root" # or travis as username
+    - DB_BETELL_PASS="" # for travis password is empty
+    - DB_BETELL_EXPORTED="$HOME/betell_rest_exported.sql"
+    - DB_BETELL_SEED="$HOME/betell_rest.yml"
 services:
   - mysql
 before_install:

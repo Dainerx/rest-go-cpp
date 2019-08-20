@@ -1,6 +1,7 @@
 package request
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/Dainerx/rest-go-cpp/models"
@@ -26,12 +27,57 @@ func NewSolverRequest(solver string, input string, user models.User) *SolveReque
 	return &sr
 }
 
-func (sr SolveRequest) GetId() int64 {
+func (sr SolveRequest) Id() int64 {
 	return sr.id
 }
 
-func AddSolveRequest(sr *SolveRequest) error {
-	result, err := models.Db.Exec("INSERT INTO solve_request (solver,input,date,user) VALUES(?,?,?,?)", (*sr).Solver, (*sr).Input, (*sr).date, (*sr).user.Id)
+func AllSolveRequests(db *sql.DB) ([]*SolveRequest, error) {
+	rows, err := db.Query("SELECT * FROM solve_request")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	srs := make([]*SolveRequest, 0)
+	for rows.Next() {
+		sr := new(SolveRequest)
+		var iduser int64
+		err := rows.Scan(&sr.id, &sr.Solver, &sr.Input, &sr.date, &iduser)
+		if err != nil {
+			return nil, err
+		}
+		user, _ := models.GetUser(db, iduser)
+		sr.user = user
+		srs = append(srs, sr)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return srs, nil
+}
+
+func GetSolveRequest(db *sql.DB, id int64) (*SolveRequest, error) {
+	rows, err := db.Query("SELECT * FROM solve_request where id=?", id)
+	sr := new(SolveRequest)
+	if err != nil {
+		return nil, err
+	} else {
+		defer rows.Close()
+		for rows.Next() {
+			var iduser int64
+			err := rows.Scan(&sr.id, &sr.Solver, &sr.Input, &sr.date, &iduser)
+			if err != nil {
+				return nil, err
+			}
+			user, _ := models.GetUser(db, iduser)
+			sr.user = user
+		}
+		return sr, nil
+	}
+}
+
+func AddSolveRequest(db *sql.DB, sr *SolveRequest) error {
+	result, err := db.Exec("INSERT INTO solve_request (solver,input,date,user) VALUES(?,?,?,?)", (*sr).Solver, (*sr).Input, (*sr).date, (*sr).user.Id)
 	if err != nil {
 		return err
 	}

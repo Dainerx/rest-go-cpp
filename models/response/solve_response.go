@@ -1,9 +1,9 @@
 package response
 
 import (
+	"database/sql"
 	"time"
 
-	"github.com/Dainerx/rest-go-cpp/models"
 	"github.com/Dainerx/rest-go-cpp/models/request"
 )
 
@@ -28,7 +28,7 @@ const (
 	NO_OUTPUT_YET             = "no output yet"
 )
 
-func SuccessResponse(sr *request.SolveRequest, output string) (SolveResponse, error) {
+func SuccessResponse(db *sql.DB, sr *request.SolveRequest, output string) (SolveResponse, error) {
 	srs := new(SolveResponse)
 	(*srs).solverRequest = sr
 	(*srs).Status = OK
@@ -40,33 +40,33 @@ func SuccessResponse(sr *request.SolveRequest, output string) (SolveResponse, er
 		(*srs).Output = NO_OUTPUT
 	}
 	(*srs).date = time.Now().Unix()
-	if err := addSolveResponse(srs); err != nil {
+	if err := addSolveResponse(db, srs); err != nil {
 		return *srs, err
 	}
 	return *srs, nil
 }
 
-func WaitingResponse(sr *request.SolveRequest) (SolveResponse, error) {
+func WaitingResponse(db *sql.DB, sr *request.SolveRequest) (SolveResponse, error) {
 	srs := new(SolveResponse)
 	(*srs).solverRequest = sr
 	(*srs).Status = OK
 	(*srs).Message = MESSAGE_INSTANCE_RUNNING
 	(*srs).Output = NO_OUTPUT_YET
 	(*srs).date = time.Now().Unix()
-	if err := addSolveResponse(srs); err != nil {
+	if err := addSolveResponse(db, srs); err != nil {
 		return *srs, err
 	}
 	return *srs, nil
 }
 
-func ErrorResponse(sr *request.SolveRequest, message string) (SolveResponse, error) {
+func ErrorResponse(db *sql.DB, sr *request.SolveRequest, message string) (SolveResponse, error) {
 	srs := new(SolveResponse)
 	(*srs).solverRequest = sr
 	(*srs).Status = ERROR
 	(*srs).Message = message
 	(*srs).Output = NO_OUTPUT
 	(*srs).date = time.Now().Unix()
-	if err := addSolveResponse(srs); err != nil {
+	if err := addSolveResponse(db, srs); err != nil {
 		return *srs, err
 	}
 	return *srs, nil
@@ -80,11 +80,11 @@ func UnauthorizedResponse() SolveResponse {
 	return *srs
 }
 
-func addSolveResponse(srs *SolveResponse) error {
-	if err := request.AddSolveRequest((*srs).solverRequest); err != nil {
+func addSolveResponse(db *sql.DB, srs *SolveResponse) error {
+	if err := request.AddSolveRequest(db, (*srs).solverRequest); err != nil {
 		return err
 	}
-	_, err := models.Db.Exec("INSERT INTO solve_request (solver_request,status,message,output,date) VALUES(?,?,?,?,?)", (*srs).solverRequest.GetId(), (*srs).Status, (*srs).Message, (*srs).Output, (*srs).date)
+	_, err := db.Exec("INSERT INTO solve_request (solver_request,status,message,output,date) VALUES(?,?,?,?,?)", (*srs).solverRequest.Id(), (*srs).Status, (*srs).Message, (*srs).Output, (*srs).date)
 	if err != nil {
 		return err
 	}

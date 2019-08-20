@@ -47,7 +47,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	// If a password exists for the given user
 	// AND, if it is the same as the password we received, the we can move ahead
 	// if NOT, then we return an "Unauthorized" status
-	if ok, _, err := models.UserExists(creds.Email, creds.Password); !ok || err != nil {
+	if ok, _, err := models.UserExists(models.Db, creds.Email, creds.Password); !ok || err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -56,7 +56,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	// here, we have kept it as 5 minutes
 	expirationTime := time.Now().Add(24 * time.Hour)
 	// Get the user id
-	_, user, _ := models.UserExists(creds.Email, creds.Password)
+	_, user, _ := models.UserExists(models.Db, creds.Email, creds.Password)
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &Claims{
 		User: user,

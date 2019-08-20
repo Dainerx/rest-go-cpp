@@ -1,6 +1,10 @@
 package models
 
-import "github.com/Dainerx/rest-go-cpp/pkg/password"
+import (
+	"database/sql"
+
+	"github.com/Dainerx/rest-go-cpp/pkg/password"
+)
 
 type User struct {
 	Id       int64
@@ -8,8 +12,8 @@ type User struct {
 	Password string
 }
 
-func AllUsers() ([]*User, error) {
-	rows, err := Db.Query("SELECT * FROM users")
+func AllUsers(db *sql.DB) ([]*User, error) {
+	rows, err := db.Query("SELECT * FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -30,13 +34,12 @@ func AllUsers() ([]*User, error) {
 	return users, nil
 }
 
-func AddUser(email, pass string) error {
-
+func AddUser(db *sql.DB, email, pass string) error {
 	hash, err := password.HashPass(pass)
 	if err != nil {
 		return err
 	} else {
-		_, err := Db.Exec("INSERT INTO users (email,password) VALUES(?,?)", email, hash)
+		_, err := db.Exec("INSERT INTO users (email,password) VALUES(?,?)", email, hash)
 		if err != nil {
 			return err
 		}
@@ -44,8 +47,8 @@ func AddUser(email, pass string) error {
 	}
 }
 
-func GetUser(id int64) (User, error) {
-	rows, err := Db.Query("SELECT * FROM users where id=?", id)
+func GetUser(db *sql.DB, id int64) (User, error) {
+	rows, err := db.Query("SELECT * FROM users where id=?", id)
 	user := new(User)
 	if err != nil {
 		return *user, err
@@ -62,9 +65,9 @@ func GetUser(id int64) (User, error) {
 }
 
 //remove bool as return type leave only user since it reflects the result
-func UserExists(email, pass string) (bool, *User, error) {
+func UserExists(db *sql.DB, email, pass string) (bool, *User, error) {
 	user := new(User)
-	rows, err := Db.Query("SELECT id, email, password FROM users where email=?", email)
+	rows, err := db.Query("SELECT id, email, password FROM users where email=?", email)
 	if err != nil {
 		return false, user, err
 	}

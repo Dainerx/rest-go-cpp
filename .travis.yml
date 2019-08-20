@@ -2,6 +2,21 @@
 dist: xenial
 language: go
 go:
-- master
+  - master
+env:
+  - DB_BETELL_DB="betell_rest"
+  - DB_BETELL_USER="root" # or travis as username
+  - DB_BETELL_PASS="" # for travis password is empty
+  - DB_BETELL_EXPORTED="$HOME/betell_rest_exported.sql"
+  - DB_BETELL_SEED="$HOME/betell_rest.yml"
+services:
+  - mysql
+before_install:
+  - wget -O $HOME/betell_rest_exported.sql https://www.dropbox.com/s/u2e1cxg1t2eh0po/betell_rest%20_exported.sql?dl=0
+  - wget -O $HOME/betell_rest.yml https://www.dropbox.com/s/s88g20y3j6zbnul/betell_seed.yml?dl=0
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS betell_rest;'
+  - mysql -e betell_rest < $DB_BETELL_EXPORTED
+
 script:
-- go test -v -race ./...
+  - go test -v -race ./...

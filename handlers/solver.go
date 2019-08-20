@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Dainerx/rest-go-cpp/cpp"
+	"github.com/Dainerx/rest-go-cpp/models"
 	"github.com/Dainerx/rest-go-cpp/models/request"
 	"github.com/Dainerx/rest-go-cpp/models/response"
 )
@@ -33,7 +34,7 @@ func Solve(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&reqg)
 	req := request.NewSolverRequest(reqg.Solver, reqg.Input, *user)
 	if (*req).Correct() == false {
-		res, err := response.ErrorResponse(req, MESSAGE_CHECK_INPUT)
+		res, err := response.ErrorResponse(models.Db, req, MESSAGE_CHECK_INPUT)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(res)
@@ -60,14 +61,14 @@ func Solve(w http.ResponseWriter, r *http.Request) {
 	select {
 	case output := <-c:
 		if output != "error" {
-			res, err := response.SuccessResponse(req, output)
+			res, err := response.SuccessResponse(models.Db, req, output)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 			}
 			json.NewEncoder(w).Encode(res)
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
-			res, err := response.ErrorResponse(req, MESSAGE_INTERNAL_ERROR)
+			res, err := response.ErrorResponse(models.Db, req, MESSAGE_INTERNAL_ERROR)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 			}
@@ -75,7 +76,7 @@ func Solve(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	case <-timer.C:
-		res, err := response.WaitingResponse(req)
+		res, err := response.WaitingResponse(models.Db, req)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
@@ -99,14 +100,14 @@ func Status(w http.ResponseWriter, r *http.Request) {
 		case <-c:
 			delete(UsersRunningInstances, (*user).Id)
 			delete(UserRequests, (*user).Id)
-			res, err := response.SuccessResponse(UserRequests[(*user).Id], <-c)
+			res, err := response.SuccessResponse(models.Db, UserRequests[(*user).Id], <-c)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 			}
 			json.NewEncoder(w).Encode(res)
 			return
 		default:
-			res, err := response.WaitingResponse(UserRequests[(*user).Id])
+			res, err := response.WaitingResponse(models.Db, UserRequests[(*user).Id])
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 			}
@@ -114,7 +115,7 @@ func Status(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		res, err := response.SuccessResponse(UserRequests[(*user).Id], "no output")
+		res, err := response.SuccessResponse(models.Db, UserRequests[(*user).Id], "no output")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		}

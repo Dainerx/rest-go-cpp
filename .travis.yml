@@ -17,7 +17,7 @@ before_install:
   - wget -O $HOME/betell_rest.yml https://www.dropbox.com/s/s88g20y3j6zbnul/betell_seed.yml?dl=0
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
   - mysql -e 'CREATE DATABASE IF NOT EXISTS betell_rest;'
-  - mysql -e betell_rest < $DB_BETELL_EXPORTED
+  - mysql --user=root --password= betell_rest < $DB_BETELL_EXPORTED
 
 script:
   - go test -v -race ./...

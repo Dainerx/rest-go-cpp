@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/Dainerx/rest-go-cpp/models"
-
 	txdb "github.com/DATA-DOG/go-txdb"
 	"github.com/romanyx/polluter"
 )
@@ -50,7 +48,7 @@ func TestAllSolveRequests(t *testing.T) {
 
 	_, err = AllSolveRequests(db)
 	if err != nil {
-		t.Error("AllSolveRequests() failed")
+		t.Fatalf("AllSolveRequests() failed:%s", err)
 	}
 }
 
@@ -65,10 +63,10 @@ func TestAddSolveRequest(t *testing.T) {
 
 	srs, _ := AllSolveRequests(db)
 	srscount := len(srs)
-	sr := NewSolverRequest("solver", "inputTestSr", models.User{Id: 11})
+	sr := NewSolverRequest("solver", "inputTestSr")
 	err = AddSolveRequest(db, sr)
 	if err != nil {
-		t.Error("AddSolveRequest() failed")
+		t.Fatalf("AddSolveRequest() failed:%s", err)
 	}
 
 	srs, _ = AllSolveRequests(db)
@@ -77,7 +75,7 @@ func TestAddSolveRequest(t *testing.T) {
 	}
 
 	sr1, err := GetSolveRequest(db, sr.Id())
-	got := (*sr1).Input
+	got := sr1.Input
 	if got != "inputTestSr" {
 		t.Errorf("got %s, want inputTestSr", got)
 	}

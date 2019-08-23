@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/Dainerx/rest-go-cpp/models"
 	"github.com/Dainerx/rest-go-cpp/pkg/slice"
 )
 
@@ -13,17 +12,15 @@ type SolveRequest struct {
 	Solver string ""
 	Input  string ""
 	date   int64
-	user   models.User
 }
 
 var SOLVERS = []string{"loop1e9", "loop1e10", "loop1K", "loop2e9", "loop4e9", "loop10K"}
 
-func NewSolverRequest(solver string, input string, user models.User) *SolveRequest {
+func NewSolverRequest(solver string, input string) *SolveRequest {
 	var sr SolveRequest
 	sr.Solver = solver
 	sr.Input = input
 	sr.date = time.Now().Unix()
-	sr.user = user
 	return &sr
 }
 
@@ -41,13 +38,10 @@ func AllSolveRequests(db *sql.DB) ([]*SolveRequest, error) {
 	srs := make([]*SolveRequest, 0)
 	for rows.Next() {
 		sr := new(SolveRequest)
-		var iduser int64
-		err := rows.Scan(&sr.id, &sr.Solver, &sr.Input, &sr.date, &iduser)
+		err := rows.Scan(&sr.id, &sr.Solver, &sr.Input, &sr.date)
 		if err != nil {
 			return nil, err
 		}
-		user, _ := models.GetUser(db, iduser)
-		sr.user = user
 		srs = append(srs, sr)
 	}
 	if err = rows.Err(); err != nil {
@@ -56,28 +50,25 @@ func AllSolveRequests(db *sql.DB) ([]*SolveRequest, error) {
 	return srs, nil
 }
 
-func GetSolveRequest(db *sql.DB, id int64) (*SolveRequest, error) {
+func GetSolveRequest(db *sql.DB, id int64) (SolveRequest, error) {
 	rows, err := db.Query("SELECT * FROM solve_request where id=?", id)
 	sr := new(SolveRequest)
 	if err != nil {
-		return nil, err
+		return *sr, err
 	} else {
 		defer rows.Close()
 		for rows.Next() {
-			var iduser int64
-			err := rows.Scan(&sr.id, &sr.Solver, &sr.Input, &sr.date, &iduser)
+			err := rows.Scan(&sr.id, &sr.Solver, &sr.Input, &sr.date)
 			if err != nil {
-				return nil, err
+				return *sr, err
 			}
-			user, _ := models.GetUser(db, iduser)
-			sr.user = user
 		}
-		return sr, nil
+		return *sr, nil
 	}
 }
 
 func AddSolveRequest(db *sql.DB, sr *SolveRequest) error {
-	result, err := db.Exec("INSERT INTO solve_request (solver,input,date,user) VALUES(?,?,?,?)", (*sr).Solver, (*sr).Input, (*sr).date, (*sr).user.Id)
+	result, err := db.Exec("INSERT INTO solve_request (solver,input,date,user) VALUES(?,?,?,?)", (*sr).Solver, (*sr).Input, (*sr).date)
 	if err != nil {
 		return err
 	}

@@ -14,5 +14,7 @@ func main() {
 	router.HandleFunc("/authenticate", handlers.Auth).Methods("POST")
 	router.HandleFunc("/solve", handlers.Solve).Methods("POST")
 	router.HandleFunc("/status", handlers.Status).Methods("GET")
+	router.HandleFunc("/last", handlers.Last).Methods("GET")
+	router.HandleFunc("/recent", handlers.Recent).Methods("GET")
 	http.ListenAndServe(":8000", router)
 }

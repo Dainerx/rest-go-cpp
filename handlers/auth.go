@@ -38,7 +38,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	var creds Credentials
 	// Get the JSON body and decode into credentials
 	err := json.NewDecoder(r.Body).Decode(&creds)
-	if err != nil {
+	if err != nil || creds.Email == "" || creds.Password == "" {
 		// If the structure of the body is wrong, return an HTTP error
 		w.WriteHeader(http.StatusBadRequest)
 		return

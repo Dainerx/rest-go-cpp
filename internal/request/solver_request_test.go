@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	txdb "github.com/DATA-DOG/go-txdb"
-
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/romanyx/polluter"
 )
 
@@ -69,10 +69,10 @@ func TestAddSolveRequest(t *testing.T) {
 
 	srs, _ := AllSolveRequests(db)
 	srscount := len(srs)
-	var sr Request = NewSolverRequest("solver", "inputTestSr") // Verify that SolveRequest implements Request.
+	var sr Request = SolveRequest{Solver: "solver", Input: "inputTestSr"} // Verify that SolveRequest implements Request.
 	err = AddSolveRequest(db, &sr)
 	if err != nil {
-		t.Fatalf("AddSolveRequest() failed:%s", err)
+		t.Fatalf("AddSolveRequest() failed: %s", err)
 	}
 
 	srs, _ = AllSolveRequests(db)
@@ -81,6 +81,9 @@ func TestAddSolveRequest(t *testing.T) {
 	}
 
 	sr1, err := GetSolveRequest(db, sr.Id())
+	if err != nil {
+		t.Fatalf("GetSolveRequest() failed: %s", err)
+	}
 	got := sr1.Input
 	if got != "inputTestSr" {
 		t.Errorf("got %s, want inputTestSr", got)

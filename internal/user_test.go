@@ -57,8 +57,8 @@ func TestAllUsers(t *testing.T) {
 		t.Errorf("AllUsers().Email = %s; want dainer@gmail.com", got)
 	}
 	got1 := len(users)
-	if got1 != 2 {
-		t.Errorf("len(AllUsers()) = %d; want 2", got1)
+	if got1 != 1 {
+		t.Errorf("len(AllUsers()) = %d; want 1", got1)
 	}
 }
 

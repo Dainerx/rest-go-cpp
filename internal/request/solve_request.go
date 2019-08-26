@@ -7,10 +7,15 @@ import (
 	"github.com/Dainerx/rest-go-cpp/pkg/slice"
 )
 
+type Request interface {
+	Id() int64
+	Correct() bool
+}
+
 type SolveRequest struct {
 	id     int64
-	Solver string ""
-	Input  string ""
+	Solver string `json:",omitempty"`
+	Input  string `json:",omitempty"`
 	date   int64
 }
 
@@ -67,12 +72,14 @@ func GetSolveRequest(db *sql.DB, id int64) (SolveRequest, error) {
 	}
 }
 
-func AddSolveRequest(db *sql.DB, sr *SolveRequest) error {
-	result, err := db.Exec("INSERT INTO solve_request (solver,input,date,user) VALUES(?,?,?,?)", (*sr).Solver, (*sr).Input, (*sr).date)
+func AddSolveRequest(db *sql.DB, r *Request) error {
+	sr, _ := (*r).(SolveRequest)
+	result, err := db.Exec("INSERT INTO solve_request (solver,input,date) VALUES(?,?,?)", sr.Solver, sr.Input, sr.date)
 	if err != nil {
 		return err
 	}
 	sr.id, _ = result.LastInsertId()
+	(*r) = sr
 	return nil
 }
 

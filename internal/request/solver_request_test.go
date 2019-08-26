@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	txdb "github.com/DATA-DOG/go-txdb"
+
 	"github.com/romanyx/polluter"
 )
 
@@ -37,6 +38,11 @@ func polluteDb(db *sql.DB, t *testing.T) {
 		t.Fatalf("failed to pollute: %s", err)
 	}
 }
+
+func TestSolveRequestTypeRequest(t *testing.T) {
+	var _ Request = SolveRequest{}       // Verify that SolveRequest implements Request.
+	var _ Request = (*SolveRequest)(nil) // Verify that *SolveRequest implements Request.
+}
 func TestAllSolveRequests(t *testing.T) {
 	db, err, closer := openDb()
 	if err != nil {
@@ -63,8 +69,8 @@ func TestAddSolveRequest(t *testing.T) {
 
 	srs, _ := AllSolveRequests(db)
 	srscount := len(srs)
-	sr := NewSolverRequest("solver", "inputTestSr")
-	err = AddSolveRequest(db, sr)
+	var sr Request = NewSolverRequest("solver", "inputTestSr") // Verify that SolveRequest implements Request.
+	err = AddSolveRequest(db, &sr)
 	if err != nil {
 		t.Fatalf("AddSolveRequest() failed:%s", err)
 	}

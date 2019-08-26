@@ -1,11 +1,11 @@
-package models
+package internal
 
 import (
 	"database/sql"
-	"log"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	log "github.com/sirupsen/logrus"
 )
 
 var Db *sql.DB
@@ -19,8 +19,8 @@ func InitDB() {
 	if err != nil {
 		log.Panic(err)
 	}
-
 	if err = Db.Ping(); err != nil {
 		log.Panic(err)
 	}
+	log.Info("Database connection established.")
 }

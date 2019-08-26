@@ -5,18 +5,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Dainerx/rest-go-cpp/models"
-	"github.com/Dainerx/rest-go-cpp/models/request"
+	"github.com/Dainerx/rest-go-cpp/internal"
+
+	"github.com/Dainerx/rest-go-cpp/internal/request"
 )
 
 type SolveResponse struct {
 	id            int
-	solverRequest request.SolveRequest
-	Status        string ""
-	Message       string ""
-	Output        string
+	SolverRequest request.Request `json:",omitempty"`
+	Status        string          ""
+	Message       string          ""
+	Output        string          `json:",omitempty"`
 	date          int64
-	user          models.User
+	user          internal.User
 }
 
 const (
@@ -32,54 +33,51 @@ const (
 	MESSAGE_SOLVER_NOT_FOUND      = "Solver not found!"
 	MESSAGE_SOLVER_FAILED         = "Solver failed, no output generated."
 	MESSAGE_INTERNAL_ERROR        = "Something went wrong..."
+	MESSAGE_LIMIT_10              = "You can only retrive the 10 most recent requests."
 	NO_OUTPUT                     = "no output"
 	NO_OUTPUT_YET                 = "no output yet"
 )
 
-func SuccessResponse(sr request.SolveRequest, output string, user models.User) SolveResponse {
+func SuccessResponse(sr request.Request, output string, user internal.User) SolveResponse {
 	sres := new(SolveResponse)
-	(*sres).solverRequest = sr
+	(*sres).SolverRequest = sr
 	(*sres).Status = OK
 	if output != NO_OUTPUT && output != "" {
 		(*sres).Message = MESSAGE_INSTANCE_FINISHED
 		(*sres).Output = output
 	} else {
 		(*sres).Message = MESSAGE_NO_INSTANCE
-		(*sres).Output = NO_OUTPUT
 	}
 	(*sres).date = time.Now().Unix()
 	(*sres).user = user
 	return *sres
 }
 
-func RedirectResponse(sr request.SolveRequest, message string, user models.User) SolveResponse {
+func RedirectResponse(sr request.Request, message string, user internal.User) SolveResponse {
 	sres := new(SolveResponse)
-	(*sres).solverRequest = sr
+	(*sres).SolverRequest = sr
 	(*sres).Status = OK
 	(*sres).Message = message
-	(*sres).Output = NO_OUTPUT
 	(*sres).date = time.Now().Unix()
 	(*sres).user = user
 	return *sres
 }
 
-func WaitingResponse(sr request.SolveRequest, user models.User) SolveResponse {
+func WaitingResponse(sr request.Request, user internal.User) SolveResponse {
 	sres := new(SolveResponse)
-	(*sres).solverRequest = sr
+	(*sres).SolverRequest = sr
 	(*sres).Status = OK
 	(*sres).Message = MESSAGE_INSTANCE_NOT_FINISHED
-	(*sres).Output = NO_OUTPUT_YET
 	(*sres).date = time.Now().Unix()
 	(*sres).user = user
 	return *sres
 }
 
-func ErrorResponse(sr request.SolveRequest, message string, user models.User) SolveResponse {
+func ErrorResponse(sr request.Request, message string, user internal.User) SolveResponse {
 	sres := new(SolveResponse)
-	(*sres).solverRequest = sr
+	(*sres).SolverRequest = sr
 	(*sres).Status = ERROR
 	(*sres).Message = message
-	(*sres).Output = NO_OUTPUT
 	(*sres).date = time.Now().Unix()
 	(*sres).user = user
 	return *sres
@@ -89,24 +87,23 @@ func UnauthorizedResponse() SolveResponse {
 	srs := new(SolveResponse)
 	(*srs).Status = ERROR
 	(*srs).Message = MESSAGE_UNAUTHORIZED
-	(*srs).Output = NO_OUTPUT
 	return *srs
 }
 
 func AddSolveResponse(db *sql.DB, sres SolveResponse) error {
-	if err := request.AddSolveRequest(db, &sres.solverRequest); err != nil {
+	if err := request.AddSolveRequest(db, &sres.SolverRequest); err != nil {
 		return err
 	}
-	_, err := db.Exec("INSERT INTO solve_response (solver_request,status,message,output,date) VALUES(?,?,?,?,?)", sres.solverRequest.Id(), sres.Status, sres.Message, sres.Output, sres.date)
+	_, err := db.Exec("INSERT INTO solve_response (solver_request,status,message,output,date, user) VALUES(?,?,?,?,?,?)", sres.SolverRequest.Id(), sres.Status, sres.Message, sres.Output, sres.date, sres.user.Id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func RecentSolveResponses(db *sql.DB, user models.User, limit int) ([]SolveResponse, error) {
+func RecentSolveResponses(db *sql.DB, user internal.User, fetch int8) ([]SolveResponse, error) {
 	var sresponses []SolveResponse
-	rows, err := db.Query("SELECT solver_request, status, message, output, date FROM solve_response WHERE user=? ORDER BY date DESC LIMIT ?", user.Id, limit)
+	rows, err := db.Query("SELECT solver_request, status, message, output, date FROM solve_response WHERE user=? ORDER BY date DESC LIMIT ?", user.Id, fetch)
 	if err != nil {
 		fmt.Println(err.Error())
 		return sresponses, err
@@ -125,7 +122,7 @@ func RecentSolveResponses(db *sql.DB, user models.User, limit int) ([]SolveRespo
 			fmt.Println(err.Error())
 			return sresponses, err
 		}
-		sres.solverRequest = sr
+		sres.SolverRequest = sr
 		sresponses = append(sresponses, sres)
 	}
 	return sresponses, nil

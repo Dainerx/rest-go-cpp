@@ -1,0 +1,25 @@
+{"level":"info","msg":"Database connection established.","time":"2019-08-26T14:47:52+02:00"}
+{"func":"historian.Recent","level":"warning","msg":"Failed to fetch, want 10 or less have 11.","time":"2019-08-26T14:48:01+02:00","user":"dainer@gmail.com"}
+{"func":"historian.Last","level":"trace","msg":"RecentSolveResponses succeeded with limit 1.","time":"2019-08-26T14:48:22+02:00","user":"dainer@gmail.com"}
+{"level":"info","msg":"Database connection established.","time":"2019-08-26T14:51:23+02:00"}
+{"func":"solver.Solve","level":"trace","msg":"Request is not correct.","time":"2019-08-26T14:51:25+02:00","user":"dainer@gmail.com"}
+{"func":"solver.Solve","level":"info","msg":"Finished running the solver loop1K against input: aze","time":"2019-08-26T14:52:01+02:00","user":"dainer@gmail.com"}
+{"func":"solver.Solve","level":"info","msg":"Finished running the solver loop1e9 against input: aze","time":"2019-08-26T14:52:34+02:00","user":"dainer@gmail.com"}
+{"func":"solver.Solve","level":"trace","msg":"Time out to solve","time":"2019-08-26T14:52:44+02:00","user":"dainer@gmail.com"}
+{"func":"solver.Solve","level":"info","msg":"Finished running the solver loop2e9 against input: aze","time":"2019-08-26T14:53:36+02:00","user":"dainer@gmail.com"}
+{"level":"info","msg":"Database connection established.","time":"2019-08-26T14:57:17+02:00"}
+{"level":"info","msg":"Database connection established.","time":"2019-08-26T14:57:39+02:00"}
+{"func":"historian.Last","level":"trace","msg":"RecentSolveResponses succeeded with limit 1.","time":"2019-08-26T14:57:43+02:00","user":"dainer@gmail.com"}
+{"level":"info","msg":"Database connection established.","time":"2019-08-26T15:02:17+02:00"}
+{"func":"historian.Recent","level":"warning","msg":"Failed to retrive query param fetch.","time":"2019-08-26T15:02:18+02:00","user":"dainer@gmail.com"}
+{"func":"historian.Recent","level":"trace","msg":"RecentSolveResponses succeeded with fetch 5.","time":"2019-08-26T15:03:02+02:00","user":"dainer@gmail.com"}
+{"func":"historian.Recent","level":"warning","msg":"Failed to parse fetch: strconv.ParseInt: parsing \"az\": invalid syntax","time":"2019-08-26T15:03:09+02:00","user":"dainer@gmail.com"}
+{"level":"info","msg":"Database connection established.","time":"2019-08-26T15:07:55+02:00"}
+{"func":"historian.Recent","level":"trace","msg":"Failed to parse fetch: strconv.ParseInt: parsing \"az\": invalid syntax","time":"2019-08-26T15:07:56+02:00","user":"dainer@gmail.com"}
+{"func":"historian.Recent","level":"trace","msg":"Failed to retrive query param fetch.","time":"2019-08-26T15:08:07+02:00","user":"dainer@gmail.com"}
+{"func":"historian.Recent","level":"trace","msg":"Failed to fetch, want 10 or less have 14.","time":"2019-08-26T15:08:15+02:00","user":"dainer@gmail.com"}
+{"func":"historian.Recent","level":"trace","msg":"RecentSolveResponses succeeded with fetch 3.","time":"2019-08-26T15:08:18+02:00","user":"dainer@gmail.com"}
+{"level":"info","msg":"Database connection established.","time":"2019-08-26T15:58:13+02:00"}
+{"func":"solver.Solve","level":"error","msg":"Error Solver: fork/exec ./cpp/loop12e9: no such file or directory","time":"2019-08-26T15:59:05+02:00","user":"dainer@gmail.com"}
+{"func":"solver.Solve","level":"info","msg":"Finished running the solver loop2e9 against input: aze","time":"2019-08-26T15:59:39+02:00","user":"dainer@gmail.com"}
+{"level":"info","msg":"Database connection established.","time":"2019-08-26T16:02:36+02:00"}

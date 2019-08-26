@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Dainerx/rest-go-cpp/models"
+	"github.com/Dainerx/rest-go-cpp/internal"
 	jwt "github.com/dgrijalva/jwt-go"
+	log "github.com/sirupsen/logrus"
 )
 
 var jwtKey = []byte("BETELL_SECRET_KEY_2019_API")
@@ -20,7 +21,7 @@ type Credentials struct {
 // Create a struct that will be encoded to a JWT.
 // We add jwt.StandardClaims as an embedded type, to provide fields like expiry time
 type Claims struct {
-	User *models.User
+	User *internal.User
 	jwt.StandardClaims
 }
 
@@ -47,7 +48,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	// If a password exists for the given user
 	// AND, if it is the same as the password we received, the we can move ahead
 	// if NOT, then we return an "Unauthorized" status
-	if ok, _, err := models.UserExists(models.Db, creds.Email, creds.Password); !ok || err != nil {
+	if ok, _, err := internal.UserExists(internal.Db, creds.Email, creds.Password); !ok || err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -56,7 +57,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	// here, we have kept it as 5 minutes
 	expirationTime := time.Now().Add(24 * time.Hour)
 	// Get the user id
-	_, user, _ := models.UserExists(models.Db, creds.Email, creds.Password)
+	_, user, _ := internal.UserExists(internal.Db, creds.Email, creds.Password)
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &Claims{
 		User: user,
@@ -73,6 +74,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If there is an error in creating the JWT return an internal server error
 		w.WriteHeader(http.StatusInternalServerError)
+		log.Error(err)
 		return
 	}
 
@@ -84,7 +86,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func Authenticated(w http.ResponseWriter, r *http.Request) (bool, *models.User) {
+func Authenticated(w http.ResponseWriter, r *http.Request) (bool, *internal.User) {
 	tokenString, err := authenificationTokenFromCookie(r)
 	if err != nil {
 		return false, nil

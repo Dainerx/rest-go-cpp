@@ -50,15 +50,11 @@ func TestAllUsers(t *testing.T) {
 
 	users, err := AllUsers(db)
 	if err != nil {
-		t.Fatal("AllUsers() failed")
+		t.Fatalf("AllUsers() failed: %v", err)
 	}
 	got := users[0].Email
 	if got != "dainer@gmail.com" {
 		t.Errorf("AllUsers().Email = %s; want dainer@gmail.com", got)
-	}
-	got1 := len(users)
-	if got1 != 1 {
-		t.Errorf("len(AllUsers()) = %d; want 1", got1)
 	}
 }
 
@@ -73,7 +69,7 @@ func TestAddUser(t *testing.T) {
 	userscount := len(users)
 	err = AddUser(db, "bla@gmail.com", "pass")
 	if err != nil {
-		t.Fatal("AddUser() failed")
+		t.Fatalf("AddUser() failed: %v", err)
 	}
 
 	users, _ = AllUsers(db)
@@ -92,7 +88,7 @@ func TestUserExists(t *testing.T) {
 	_ = AddUser(db, "test@gmail.com", "pass")
 	got, _, err := UserExists(db, "test@gmail.com", "pass")
 	if err != nil {
-		t.Error("UserExists(test@gmail.com,pass) failed")
+		t.Errorf("UserExists(test@gmail.com,pass) failed: %v", err)
 	}
 	if got != true {
 		t.Errorf("UserExists(test@gmail.com,pass) = %s; want true", strconv.FormatBool(got))
@@ -100,7 +96,7 @@ func TestUserExists(t *testing.T) {
 
 	got, _, err = UserExists(db, "1@gmail.com", "pass")
 	if err != nil {
-		t.Error("UserExists(1@gmail.com,pass) failed")
+		t.Errorf("UserExists(1@gmail.com,pass) failed")
 	}
 	if got != false {
 		t.Errorf("UserExists(1@gmail.com,pass) = %s; want false", strconv.FormatBool(got))

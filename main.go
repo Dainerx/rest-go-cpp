@@ -25,14 +25,18 @@ func init() {
 	log.SetLevel(log.TraceLevel)
 }
 func main() {
-	internal.InitDB()
+	err := internal.InitDB()
+	if err != nil {
+		log.Panicf("Database connection failed: %v", err)
+	}
+	log.Info("Database connection established.")
 	router := mux.NewRouter()
 	router.HandleFunc("/authenticate", handlers.Auth).Methods("POST")
 	router.HandleFunc("/solve", handlers.Solve).Methods("POST")
 	router.HandleFunc("/status", handlers.Status).Methods("GET")
 	router.HandleFunc("/last", handlers.Last).Methods("GET")
 	router.HandleFunc("/recent", handlers.Recent).Methods("GET")
-	err := http.ListenAndServe(":8000", router)
+	err = http.ListenAndServe(":8000", router)
 	if err != nil {
 		log.Panicf("Failed to start service: %v.", err)
 	}

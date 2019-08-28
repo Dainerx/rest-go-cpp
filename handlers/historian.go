@@ -26,7 +26,7 @@ func Last(w http.ResponseWriter, r *http.Request) {
 		"user": (*ptruser).Email,
 		"func": "historian.Last",
 	})
-	sresponses, err := response.RecentSolveResponses(internal.Db, *ptruser, 1)
+	sresponses, err := response.RecentSolveResponsesPerUser(internal.Db, *ptruser, 1)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		logger.Errorf("RecentSolveResponses failed: %v.", err)
@@ -77,7 +77,7 @@ func Recent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sresponses, err := response.RecentSolveResponses(internal.Db, *ptruser, int8(fetch))
+	sresponses, err := response.RecentSolveResponsesPerUser(internal.Db, *ptruser, int8(fetch))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		logger.Errorf("RecentSolveResponses failed: %v.", err)

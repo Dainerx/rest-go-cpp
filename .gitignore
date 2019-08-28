@@ -33,3 +33,6 @@
 *.log
 *.sql
 *.sqlite
+
+#text files
+*.txt

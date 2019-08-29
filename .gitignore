@@ -36,3 +36,4 @@
 
 #text files
 *.txt
+!pkg/vrpreader/27x12.txt

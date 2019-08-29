@@ -2,8 +2,9 @@ package request
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
+
+	"github.com/Dainerx/rest-go-cpp/pkg/vrpreader"
 
 	"github.com/Dainerx/rest-go-cpp/pkg/slice"
 )
@@ -86,7 +87,7 @@ func AddSolveRequest(db *sql.DB, r *Request) error {
 
 //solver response should be passed here as reference
 func (sr SolveRequest) Correct() bool {
-	return !sr.empty() && sr.inputCorrect() && sr.solverExists()
+	return !sr.empty() && sr.solverExists()
 }
 
 func (sr SolveRequest) solverExists() bool {
@@ -101,19 +102,9 @@ func (sr SolveRequest) empty() bool {
 }
 
 func (sr SolveRequest) inputCorrect() bool {
-	input := sr.Input
-	var trucks, clients, dimension, sum int
-	n, err := fmt.Sscanf(input, "%d %d %d %d", &trucks, &clients, &dimension, &sum)
-	if n != 4 || err != nil {
+	_, err := vrpreader.ReadInstance(sr.Input)
+	if err != nil {
 		return false
 	}
-
-	/*
-			for i := 0; i < trucks; i++ {
-				"%d %d %d %d %d %lf %lf %d %lf %lf", $idTruck, $capacity, $startTime,
-		                    $endTime, $idStartPoint, $latitudeStartPoint, $longitudeStartPoint, $idEndPoint,
-		                    $latitudeEndPoint, $longitudeEndPoint
-			}*/
-
 	return true
 }
